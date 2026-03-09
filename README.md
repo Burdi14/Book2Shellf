@@ -44,4 +44,4 @@ Access the admin panel at: `/book2shadmin`
 - `POST /api/admin/upload/cover`
 
 ## License
-eMIT
+MIT
