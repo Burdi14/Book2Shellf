@@ -1,3 +1,5 @@
+# Book2Shellf
+
 ## Tech Stack
 
 - **Backend**: Go (Gin framework)
@@ -13,58 +15,15 @@ docker-compose up -d
 open http://localhost:8000
 ```
 
-### Manual Setup
-
-**Backend:**
-```bash
-cd app
-go mod tidy
-go run ./main
-```
-
-**Frontend:**
-```bash
-cd app/frontend
-npm install
-npm start
-```
-
-## Admin Access
+## Admin Panel
 
 Access the admin panel at: `/book2shadmin`
 
 **Default credentials:**
 - Username: `admin`
-- Password: ``
+- Password: `changeme`
 
-> ⚠️ **Change these in production** by setting environment variables:
-> - `ADMIN_USERNAME`
-> - `ADMIN_PASSWORD`
-
-## Project Structure
-
-```
-├── app/
-│   ├── handlers/         # Go handlers and database
-│   │   ├── auth.go       # Authentication
-│   │   ├── database.go   # SQLite operations
-│   │   ├── handlers.go   # API endpoints
-│   │   └── models.go     # Data models
-│   ├── main/
-│   │   └── main.go       # Entry point
-│   └── frontend/         # React application
-│       ├── src/
-│       │   ├── components/
-│       │   ├── pages/
-│       │   ├── api.js
-│       │   └── index.css  # Hacker theme styles
-│       └── public/
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
-```
-
-## API Endpoints
+## API
 
 ### Public
 - `GET /api/books`
@@ -85,4 +44,4 @@ Access the admin panel at: `/book2shadmin`
 - `POST /api/admin/upload/cover`
 
 ## License
-MIT
+eMIT
