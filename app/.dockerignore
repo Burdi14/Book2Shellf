@@ -1,0 +1,8 @@
+.git
+.gitignore
+*.md
+.env*
+.vscode
+frontend/node_modules
+frontend/build
+**/*_test.go

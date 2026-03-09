@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+      - GIN_MODE=release
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=changeme
+    volumes:
+      - book2shelf_data:/app/data
+      - book2shelf_uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - book2shelf_network
+
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - book2shelf_network
+
+networks:
+  book2shelf_network:
+    driver: bridge
+
+volumes:
+  book2shelf_data:
+  book2shelf_uploads:
