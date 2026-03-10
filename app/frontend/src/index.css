@@ -325,6 +325,13 @@ input::placeholder, textarea::placeholder {
   height: fit-content;
   position: sticky;
   top: 100px;
+  z-index: 10;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+  }
 }
 
 .sidebar-title {
@@ -584,8 +591,61 @@ input::placeholder, textarea::placeholder {
 }
 
 @media (max-width: 700px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
   .modal-content {
     grid-template-columns: 1fr;
+    padding: 15px;
+    gap: 20px;
+  }
+
+  .modal-cover {
+    height: 260px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .terminal-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .modal-stat-value {
+    font-size: 14px;
+    word-break: break-all;
+  }
+
+  .modal-stat-label {
+    font-size: 9px;
+  }
+
+  .modal-stats {
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .modal-description-block {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .modal-output-line {
+    font-size: 11px;
+    padding: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .download-btn {
+    padding: 12px;
+    font-size: 14px;
   }
 }
 
@@ -1345,6 +1405,54 @@ input::placeholder, textarea::placeholder {
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  .admin-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .file-upload {
+    padding: 20px;
+  }
+
+  .cover-cropper {
+    grid-template-columns: 1fr;
+  }
+
+  .tab {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .tab-strip {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 400px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .section-title {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-right {
+    justify-content: center;
+  }
 }
 
 /* ================================ */
@@ -1395,6 +1503,9 @@ input::placeholder, textarea::placeholder {
   font-size: 12px;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .terminal-spacer {
