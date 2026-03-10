@@ -234,10 +234,11 @@ input::placeholder, textarea::placeholder {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
+  text-align: center;
 }
 
 .logo {
@@ -565,6 +566,9 @@ input::placeholder, textarea::placeholder {
   padding: 10px 15px;
   background: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .modal-close {
@@ -574,7 +578,9 @@ input::placeholder, textarea::placeholder {
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 24px;
+  font-size: 26px;
+  padding: 8px;
+  line-height: 1;
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -647,6 +653,11 @@ input::placeholder, textarea::placeholder {
     padding: 12px;
     font-size: 14px;
   }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .modal-cover {
@@ -662,7 +673,7 @@ input::placeholder, textarea::placeholder {
 .modal-cover img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .modal-placeholder {
@@ -782,6 +793,17 @@ input::placeholder, textarea::placeholder {
 .section-value {
   color: var(--accent-primary);
   margin-left: 5px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.modal-close-btn {
+  padding: 10px 16px;
 }
 
 .download-btn {
@@ -1520,7 +1542,8 @@ input::placeholder, textarea::placeholder {
 .logo-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 .ascii-logo {
@@ -1547,6 +1570,7 @@ input::placeholder, textarea::placeholder {
   font-size: 12px;
   color: var(--red-primary);
   margin-top: 5px;
+  text-align: center;
 }
 
 /* Terminal Navigation */
@@ -1575,10 +1599,6 @@ input::placeholder, textarea::placeholder {
   color: var(--red-primary);
   font-weight: bold;
 }
-
-/* ================================ */
-/* Boot Sequence Styles             */
-/* ================================ */
 
 .boot-sequence {
   position: fixed;

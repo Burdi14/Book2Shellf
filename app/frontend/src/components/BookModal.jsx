@@ -18,7 +18,14 @@ function BookModal({ book, onClose }) {
   };
 
   const handleDownload = () => {
-    window.open(`/api/books/${book.id}/download`, '_blank');
+    // Force a real download to avoid in-browser zoomed previews on some mobile devices
+    const link = document.createElement('a');
+    link.href = `/api/books/${book.id}/download`;
+    link.setAttribute('download', book.file_name || 'book');
+    link.rel = 'noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   const handleOverlayClick = (e) => {
@@ -94,13 +101,18 @@ function BookModal({ book, onClose }) {
               </p>
             )}
             
-            <button 
-              className="btn btn-primary download-btn terminal-btn-download"
-              onClick={handleDownload}
-              disabled={!book.file_url}
-            >
-              {book.file_url ? `$ wget book${book.file_name ? book.file_name.slice(book.file_name.lastIndexOf('.')) : ''}` : '# File not available'}
-            </button>
+            <div className="modal-actions">
+              <button 
+                className="btn btn-primary download-btn terminal-btn-download"
+                onClick={handleDownload}
+                disabled={!book.file_url}
+              >
+                {book.file_url ? `$ wget book${book.file_name ? book.file_name.slice(book.file_name.lastIndexOf('.')) : ''}` : '# File not available'}
+              </button>
+              <button className="btn btn-outline modal-close-btn" onClick={onClose}>
+                close
+              </button>
+            </div>
           </div>
         </div>
       </div>
