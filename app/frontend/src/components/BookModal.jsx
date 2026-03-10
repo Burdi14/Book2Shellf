@@ -17,6 +17,15 @@ function BookModal({ book, onClose }) {
     });
   };
 
+  const slugify = (title) => title.toLowerCase().replace(/\s+/g, '_');
+
+  const truncatedSlug = (title) => {
+    const base = slugify(title);
+    const limit = 30;
+    if (base.length <= limit) return base;
+    return base.slice(0, limit) + '…';
+  };
+
   const handleDownload = () => {
     // Force a real download to avoid in-browser zoomed previews on some mobile devices
     const link = document.createElement('a');
@@ -37,13 +46,13 @@ function BookModal({ book, onClose }) {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal terminal-modal">
-        <div className="modal-titlebar">
+          <div className="modal-titlebar">
           <div className="terminal-buttons">
             <span className="terminal-btn close" onClick={onClose}></span>
             <span className="terminal-btn minimize"></span>
             <span className="terminal-btn maximize"></span>
           </div>
-          <div className="terminal-title">cat ./library/{book.title.toLowerCase().replace(/\s+/g, '_')}.info</div>
+            <div className="terminal-title">cat ./library/{truncatedSlug(book.title)}.info</div>
           <div className="terminal-spacer"></div>
         </div>
         
@@ -66,7 +75,7 @@ function BookModal({ book, onClose }) {
           <div className="modal-info">
             <div className="modal-output-line">
               <span className="output-prefix">$</span>
-              <span className="output-cmd">file {book.title.toLowerCase().replace(/\s+/g, '_')}{book.file_name ? book.file_name.slice(book.file_name.lastIndexOf('.')) : ''}</span>
+              <span className="output-cmd">file {truncatedSlug(book.title)}{book.file_name ? book.file_name.slice(book.file_name.lastIndexOf('.')) : ''}</span>
             </div>
             
             <h2 className="modal-title">{book.title}</h2>

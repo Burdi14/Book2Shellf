@@ -507,10 +507,12 @@ input::placeholder, textarea::placeholder {
   font-style: italic;
 }
 
+
 .book-meta {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   font-size: 11px;
   color: var(--text-muted);
   font-family: var(--font-mono);
@@ -528,6 +530,7 @@ input::placeholder, textarea::placeholder {
 
 .book-size {
   color: var(--accent-primary);
+  align-self: flex-end;
 }
 
 /* Book Detail Modal */
@@ -548,8 +551,8 @@ input::placeholder, textarea::placeholder {
 .modal {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  max-width: 900px;
-  width: 100%;
+  width: min(90vw, 760px);
+  max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -690,6 +693,9 @@ input::placeholder, textarea::placeholder {
   padding: 10px;
   background: var(--bg-tertiary);
   border-left: 2px solid var(--success);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .output-prefix {
