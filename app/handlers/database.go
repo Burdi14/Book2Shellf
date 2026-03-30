@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -81,6 +83,51 @@ func runMigrations() {
 				db.Exec(`UPDATE books SET share_token = ? WHERE id = ?`, uuid.New().String(), id)
 			}
 		}
+	}
+
+	backfillMissingFileSizes()
+}
+
+func resolveStoredFileSize(fileURL string) (int64, error) {
+	if strings.TrimSpace(fileURL) == "" {
+		return 0, os.ErrNotExist
+	}
+
+	cleanPath := filepath.Clean(strings.TrimPrefix(fileURL, "/"))
+	info, err := os.Stat(filepath.Join(".", cleanPath))
+	if err != nil {
+		return 0, err
+	}
+
+	return info.Size(), nil
+}
+
+func backfillMissingFileSizes() {
+	rows, err := db.Query(`SELECT id, file_url FROM books WHERE COALESCE(file_size, 0) <= 0 AND COALESCE(file_url, '') != ''`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	var repaired int
+	for rows.Next() {
+		var id, fileURL string
+		if err := rows.Scan(&id, &fileURL); err != nil {
+			continue
+		}
+
+		size, err := resolveStoredFileSize(fileURL)
+		if err != nil || size <= 0 {
+			continue
+		}
+
+		if _, err := db.Exec(`UPDATE books SET file_size = ?, updated_at = ? WHERE id = ?`, size, time.Now(), id); err == nil {
+			repaired++
+		}
+	}
+
+	if repaired > 0 {
+		log.Printf("Repaired file_size for %d books", repaired)
 	}
 }
 
@@ -366,6 +413,12 @@ func CreateBookDB(book *Book) error {
 	book.CreatedAt = time.Now()
 	book.UpdatedAt = time.Now()
 
+	if book.FileSize <= 0 && book.FileURL != "" {
+		if size, err := resolveStoredFileSize(book.FileURL); err == nil {
+			book.FileSize = size
+		}
+	}
+
 	var sectionID interface{} = book.SectionID
 	if book.SectionID == "" {
 		sectionID = nil
@@ -383,6 +436,12 @@ func CreateBookDB(book *Book) error {
 // UpdateBookDB updates a book
 func UpdateBookDB(book *Book) error {
 	book.UpdatedAt = time.Now()
+
+	if book.FileSize <= 0 && book.FileURL != "" {
+		if size, err := resolveStoredFileSize(book.FileURL); err == nil {
+			book.FileSize = size
+		}
+	}
 
 	var sectionID interface{} = book.SectionID
 	if book.SectionID == "" {

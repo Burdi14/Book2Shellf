@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -249,6 +250,73 @@ func TestCreateBookWithAuth(t *testing.T) {
 	books, ok := response.Data.([]interface{})
 	if !ok || len(books) == 0 {
 		t.Error("Expected at least one book")
+	}
+}
+
+func TestCreateBookDerivesFileSizeFromStoredFile(t *testing.T) {
+	router := setupTestRouter()
+
+	loginData := AdminCredentials{
+		Username: "admin",
+		Password: "B00k2Sh3lf@dm1n!",
+	}
+	jsonData, _ := json.Marshal(loginData)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+
+	var loginResponse LoginResponse
+	json.Unmarshal(w.Body.Bytes(), &loginResponse)
+	token := loginResponse.Token
+
+	if err := os.MkdirAll("./uploads/books", 0o755); err != nil {
+		t.Fatalf("failed to create uploads dir: %v", err)
+	}
+
+	filePath := filepath.Join(".", "uploads", "books", "size-test.pdf")
+	fileBytes := []byte("1234567890")
+	if err := os.WriteFile(filePath, fileBytes, 0o644); err != nil {
+		t.Fatalf("failed to write test book file: %v", err)
+	}
+	defer os.Remove(filePath)
+
+	bookData := map[string]interface{}{
+		"title":       "Sized Book",
+		"file_url":    "/uploads/books/size-test.pdf",
+		"file_name":   "size-test.pdf",
+		"description": "Book with inferred file size",
+	}
+	jsonData, _ = json.Marshal(bookData)
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("POST", "/api/admin/books", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusCreated {
+		t.Fatalf("Expected status 201, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	var response APIResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+
+	payload, ok := response.Data.(map[string]interface{})
+	if !ok {
+		t.Fatalf("unexpected response payload: %#v", response.Data)
+	}
+
+	sizeValue, ok := payload["file_size"].(float64)
+	if !ok {
+		t.Fatalf("expected file_size in response payload, got %#v", payload["file_size"])
+	}
+
+	if int64(sizeValue) != int64(len(fileBytes)) {
+		t.Fatalf("expected file_size %d, got %d", len(fileBytes), int64(sizeValue))
 	}
 }
 
