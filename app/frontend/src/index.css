@@ -1,5 +1,5 @@
-/* Book2Shelf - Retro Terminal Theme */
-/* Deep Gray + Red Accent Palette */
+/* Book2Shelf - Red Dark Terminal Theme */
+/* Deep Gray + Red Palette */
 
 :root {
   --font-mono: 'JetBrains Mono', 'Share Tech Mono', monospace;
@@ -391,6 +391,9 @@ input::placeholder, textarea::placeholder {
   transition: all 0.3s ease;
   overflow: hidden;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .book-card:hover {
@@ -471,6 +474,9 @@ input::placeholder, textarea::placeholder {
 
 .book-info {
   padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .book-filename {
@@ -516,6 +522,7 @@ input::placeholder, textarea::placeholder {
   font-size: 11px;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  margin-top: auto;
 }
 
 .book-downloads {
@@ -530,7 +537,7 @@ input::placeholder, textarea::placeholder {
 
 .book-size {
   color: var(--accent-primary);
-  align-self: flex-end;
+  align-self: flex-start;
 }
 
 /* Book Detail Modal */
