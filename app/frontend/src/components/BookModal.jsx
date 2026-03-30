@@ -98,8 +98,8 @@ function BookModal({ book, onClose }) {
                 <div className="modal-stat-value">{formatSize(book.file_size)}</div>
               </div>
               <div className="modal-stat">
-                <div className="modal-stat-label"><CalendarIcon size={14} /> added</div>
-                <div className="modal-stat-value">{formatDate(book.created_at)}</div>
+                <div className="modal-stat-label"><CalendarIcon size={14} /> year</div>
+                <div className="modal-stat-value">{book.year}</div>
               </div>
             </div>
             
