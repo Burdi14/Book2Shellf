@@ -320,6 +320,45 @@ func TestCreateBookDerivesFileSizeFromStoredFile(t *testing.T) {
 	}
 }
 
+func TestSyncBookFileSizesRepairsExistingZeroSizes(t *testing.T) {
+	if err := os.MkdirAll("./uploads/books", 0o755); err != nil {
+		t.Fatalf("failed to create uploads dir: %v", err)
+	}
+
+	filePath := filepath.Join(".", "uploads", "books", "startup-sync.pdf")
+	fileBytes := []byte("startup-size-check")
+	if err := os.WriteFile(filePath, fileBytes, 0o644); err != nil {
+		t.Fatalf("failed to write test book file: %v", err)
+	}
+	defer os.Remove(filePath)
+
+	book := &Book{
+		Title:    "Startup Sync",
+		FileURL:  "/uploads/books/startup-sync.pdf",
+		FileName: "startup-sync.pdf",
+		FileSize: 0,
+	}
+
+	if err := CreateBookDB(book); err != nil {
+		t.Fatalf("failed to create book: %v", err)
+	}
+
+	if _, err := db.Exec(`UPDATE books SET file_size = 0 WHERE id = ?`, book.ID); err != nil {
+		t.Fatalf("failed to reset file size: %v", err)
+	}
+
+	SyncBookFileSizes()
+
+	storedBook, err := GetBookByID(book.ID)
+	if err != nil {
+		t.Fatalf("failed to load book: %v", err)
+	}
+
+	if storedBook.FileSize != int64(len(fileBytes)) {
+		t.Fatalf("expected repaired file_size %d, got %d", len(fileBytes), storedBook.FileSize)
+	}
+}
+
 func TestInvalidAuthToken(t *testing.T) {
 	router := setupTestRouter()
 	w := httptest.NewRecorder()

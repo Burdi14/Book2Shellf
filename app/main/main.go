@@ -11,14 +11,18 @@ import (
 )
 
 func main() {
+	// Ensure runtime directories exist before DB/file sync work.
+	os.MkdirAll("./data", 0755)
+	os.MkdirAll("./uploads/books", 0755)
+	os.MkdirAll("./uploads/covers", 0755)
+
 	// Initialize database
 	if err := handlers.InitDB(); err != nil {
 		log.Fatal("Failed to initialize database:", err)
 	}
 
-	// Create uploads directory
-	os.MkdirAll("./uploads/books", 0755)
-	os.MkdirAll("./uploads/covers", 0755)
+	// Refresh stored file sizes from the uploaded files on disk at startup.
+	handlers.SyncBookFileSizes()
 
 	router := gin.Default()
 

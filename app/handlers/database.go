@@ -85,7 +85,7 @@ func runMigrations() {
 		}
 	}
 
-	backfillMissingFileSizes()
+	syncStoredFileSizes()
 }
 
 func resolveStoredFileSize(fileURL string) (int64, error) {
@@ -102,17 +102,23 @@ func resolveStoredFileSize(fileURL string) (int64, error) {
 	return info.Size(), nil
 }
 
-func backfillMissingFileSizes() {
-	rows, err := db.Query(`SELECT id, file_url FROM books WHERE COALESCE(file_size, 0) <= 0 AND COALESCE(file_url, '') != ''`)
+func syncStoredFileSizes() {
+	rows, err := db.Query(`SELECT id, file_url, COALESCE(file_size, 0) FROM books WHERE COALESCE(file_url, '') != ''`)
 	if err != nil {
 		return
 	}
-	defer rows.Close()
 
-	var repaired int
+	type fileSizeUpdate struct {
+		id   string
+		size int64
+	}
+
+	var updates []fileSizeUpdate
+
 	for rows.Next() {
 		var id, fileURL string
-		if err := rows.Scan(&id, &fileURL); err != nil {
+		var storedSize int64
+		if err := rows.Scan(&id, &fileURL, &storedSize); err != nil {
 			continue
 		}
 
@@ -121,14 +127,29 @@ func backfillMissingFileSizes() {
 			continue
 		}
 
-		if _, err := db.Exec(`UPDATE books SET file_size = ?, updated_at = ? WHERE id = ?`, size, time.Now(), id); err == nil {
+		if size == storedSize {
+			continue
+		}
+
+		updates = append(updates, fileSizeUpdate{id: id, size: size})
+	}
+	rows.Close()
+
+	var repaired int
+	for _, update := range updates {
+		if _, err := db.Exec(`UPDATE books SET file_size = ?, updated_at = ? WHERE id = ?`, update.size, time.Now(), update.id); err == nil {
 			repaired++
 		}
 	}
 
 	if repaired > 0 {
-		log.Printf("Repaired file_size for %d books", repaired)
+		log.Printf("Synchronized file_size for %d books", repaired)
 	}
+}
+
+// SyncBookFileSizes refreshes stored file sizes from files on disk.
+func SyncBookFileSizes() {
+	syncStoredFileSizes()
 }
 
 // InitDB initializes the SQLite database
