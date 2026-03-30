@@ -14,7 +14,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
     -tags 'netgo osusergo sqlite_omit_load_extension' \
     -o book2shelf ./main
 
-FROM alpine:3.19
+FROM alpine:latest
 
 WORKDIR /app
 

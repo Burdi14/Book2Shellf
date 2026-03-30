@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-	// Ensure runtime directories exist before DB/file sync work.
 	os.MkdirAll("./data", 0755)
 	os.MkdirAll("./uploads/books", 0755)
 	os.MkdirAll("./uploads/covers", 0755)
@@ -21,18 +20,15 @@ func main() {
 		log.Fatal("Failed to initialize database:", err)
 	}
 
-	// Refresh stored file sizes from the uploaded files on disk at startup.
 	handlers.SyncBookFileSizes()
 
 	router := gin.Default()
 
-	// CORS configuration
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
 	router.Use(cors.New(config))
 
-	// Serve uploaded files
 	router.Static("/uploads", "./uploads")
 
 	// Public API routes
